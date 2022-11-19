@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>deptList</title>
+</head>
+<body>
+
+<table>
+    <tr th:each="dept, inter:${deptList}">
+        <td th:text="${inter.index}"></td>
+        <td><a th:href="@{/dept/} + ${dept.deptno}" th:text="${dept.deptno}"></a></td>
+        <td th:text="${dept.dname}"></td>
+        <td th:text="${dept.loc}"></td>
+    </tr>
+</table>
+
+<table>
+    <form method="post" th:action="@{/dept}">
+        <tr>
+            <td>deptno</td>
+            <td><input type="text" name="deptno"/></td>
+        </tr>
+        <tr>
+            <td>dname</td>
+            <td><input type="text" name="dname"/></td>
+        </tr>
+        <tr>
+            <td>loc</td>
+            <td><input type="text" name="loc"/></td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="save"/></td>
+        </tr>
+    </form>
+</table>
+
+</body>
+</html>
