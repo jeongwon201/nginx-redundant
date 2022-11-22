@@ -3,4 +3,4 @@ server:
 
 spring:
   profiles:
-    active: dev,db-maria
+    active: dev,db-maria-docker
