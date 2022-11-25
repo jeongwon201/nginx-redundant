@@ -10,7 +10,7 @@ public class BaseController {
 
     @GetMapping
     public String getIndex(String data, ModelMap modelMap) {
-        modelMap.addAttribute("data", "GET" + data);
+        modelMap.addAttribute("data", "GET index [" + data + "]");
         return "index";
     }
 
