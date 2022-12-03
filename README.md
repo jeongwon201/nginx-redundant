@@ -54,3 +54,20 @@ yum remove -y java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-headless.x86_64 java-
 <br />
 <br />
 
+Git, Docker Compose 를 설치합니다.
+```
+yum install -y git docker-compose-plugin
+```
+<br />
+<br />
+
+
+작업 폴더를 생성 후 폴더로 이동합니다.
+```
+mkdir standard
+cd standard
+```
+<br />
+<br />
+
+
