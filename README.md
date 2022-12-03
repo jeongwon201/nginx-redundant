@@ -243,6 +243,10 @@ chmod +x 03_MAKE_DOCKER_IMAGE.sh
 <br />
 <br />
 
+※ 04 스크립트 파일은 아래 파일을 템플릿으로 아래 파일을 정의하는데, 템플릿이 존재하지 않아 직접 작성하는 것으로 대체합니다.
+<br />
+<br />
+
 ### 이중화를 위한 nginx conf 파일 정의
 conf 파일 ```default.conf``` 을 vi 편집기로 생성 후 다음 내용을 입력하여 저장합니다.
 ```
@@ -337,3 +341,21 @@ networks:
 <br />
 <br />
 
+### Docker Compose로 컨테이너 실행
+작업 파일 ```05_UP_DOCKER_COMPOSE.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력 저장합니다.
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+docker compose -f docker-compose.yml up -d
+```
+<br />
+
+권한 부여 후 파일을 실행합니다.
+```
+chmod +x 05_UP_DOCKER_COMPOSE.sh
+
+./05_UP_DOCKER_COMPOSE.sh
+```
+<br />
+<br />
