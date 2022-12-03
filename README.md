@@ -71,3 +71,62 @@ cd standard
 <br />
 
 
+편의를 위해 Bash Shell Script를 사용하여 작업 파일을 생성합니다.   
+<br />
+
+환경 변수 파일 ```00_SET_ENV``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+```
+#! /usr/bin/bash
+
+# docker-compose network, nginx, springboot, mariadb 가 엮이는 네트워크 이름
+export APP_NETWORK=standard_net
+
+# DOCKER 상에서 WAS 호출할 수 있는 이름
+export DOCKER_WAS_NAME1=dockerWAS1
+export DOCKER_WAS_NAME2=dockerWAS2
+
+# DOCKER 상에서 DB 호출할 수 있는 이름
+export DOCKER_DB_NAME=dockerDB
+
+
+############### BUILD AREA ###############
+# 로컬 머신에 어플리케이션 설치 위치
+export APP_BASE=/app
+
+# 로컬 머신 메이븐 설치 위치
+export MAVEN=${APP_BASE}/build/maven
+
+# 소스 URL (github)
+export SOURCE_URL=https://github.com/jeongwon201/nginx-redundant
+
+# PROJECT_NAME
+export PROJECT_NAME=spring-cloud
+export APP_NAME=standard
+
+# 디렉토리
+export PROJECT_DIR=/app/$PROJECT_NAME
+export APP_DIR=/app/$PROJECT_NAME/$APP_NAME
+
+# 도커 이미지 이름
+export IMAGE_NAME=jeongwon201/cloud:springboot_v1
+
+
+############### SPRINGBOOT AREA ###############
+# VERSION
+export VERSION=1
+export JAR_NAME=$APP_NAME-$VERSION
+export SPRINGBOOT_PORT=8000
+
+# 스프링 부트 런타임 옵션
+export PARAMETER=spring.profiles.active=prod,db-mariadb-docker
+export ACTIVE_PROFILE=prod,db-maria-docker
+
+
+############### DB AREA ###############
+export SPRINGBOOT_PORT=8000
+export MYSQL_DATABASE=prod
+export MYSQL_USER=user01
+export MYSQL_PASSWORD=user01
+export MYSQL_ROOT_PASSWORD=password
+export LOCAL_DB_DIR=/app/mariadb
+```
