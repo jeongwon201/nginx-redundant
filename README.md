@@ -71,7 +71,7 @@ cd standard
 <br />
 
 
-환경 변수 파일 ```00_SET_ENV``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+환경 변수 파일 ```00_SET_ENV``` 을 vi 편집기로 생성 후 다음 내용을 입력니다.
 ```
 #! /usr/bin/bash
 
@@ -135,7 +135,7 @@ export LOCAL_DB_DIR=/app/mariadb
 <br />
 
 ### Java 11, Maven 빌드 도구 설치
-작업 파일 ```01_SET_BUILD.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+작업 파일 ```01_SET_BUILD.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력하여 저장합니다.
 ```
 #! /usr/bin/bash
 . ./00_SET_ENV
@@ -161,6 +161,7 @@ unzip -d $MAVEN $MAVEN/apache-maven-3.6.3-bin.zip
 권한 부여 후 파일을 실행합니다.
 ```
 chmod +x 01_SET_BUILD.sh
+
 ./01_SET_BUILD.sh
 ```
 
@@ -168,7 +169,7 @@ chmod +x 01_SET_BUILD.sh
 <br />
 
 ### GitHub에 업로드 된 웹 어플리케이션을 Jar 파일로 빌드 후 작업 폴더에 복사
-작업 파일 ```02_BUILD.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+작업 파일 ```02_BUILD.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력하여 저장합니다.
 ```
 #! /usr/bin/bash
 . ./00_SET_ENV
@@ -189,6 +190,7 @@ cp $APP_DIR/target/$JAR_NAME.jar ./
 권한 부여 후 파일을 실행합니다.
 ```
 chmod +x 02_BUILD.sh
+
 ./02_BUILD.sh
 ```
 <br />
@@ -199,7 +201,7 @@ Java 11 버전 외 다른 버전을 삭제하지 않으면 오류가 발생합�
 <br />
 
 ### 컨테이너 이미지를 위한 Dockerfile 생성
-Dockerfile ```Dockerfile``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+Dockerfile ```Dockerfile``` 을 vi 편집기로 생성 후 다음 내용을 입력하여 저장합니다.
 ```
 FROM centos:7
 
@@ -223,7 +225,7 @@ EXPOSE 8000
 <br />
 
 ### 컨테이너 이미지 생성
-작업 파일 ```03_MAKE_DOCKER_IMAGE.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+작업 파일 ```03_MAKE_DOCKER_IMAGE.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력하여 저장합니다.
 ```
 #! /usr/bin/bash
 . ./00_SET_ENV
@@ -235,7 +237,102 @@ docker build -t $IMAGE_NAME ./
 권한 부여 후 파일을 실행합니다.
 ```
 chmod +x 03_MAKE_DOCKER_IMAGE.sh
+
 ./03_MAKE_DOCKER_IMAGE.sh
+```
+<br />
+<br />
+
+### 이중화를 위한 nginx conf 파일 정의
+conf 파일 ```default.conf``` 을 vi 편집기로 생성 후 다음 내용을 입력하여 저장합니다.
+```
+upstream my_upstream {
+	server dockerWAS1:8000;
+	server dockerWAS2:8000;
+}
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	server_name localhost;
+
+	location / {
+		proxy_pass http://my_upstream;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header Host $http_host;
+	}
+}
+```
+<br />
+<br />
+
+### 네트워크, 컨테이너 생성을 위한 Docker Compose YML 파일 정의
+YML 파일 ```docker-compose.yml``` 을 vi 편집기로 생성 후 다음 내용을 입력 저장합니다.
+```
+version: '3.4'
+services:
+
+  web:
+    image: nginx
+    networks:
+      - standard_net
+    ports:
+      - "80:80"
+    links:
+      - was1:dockerWAS1
+      - was2:dockerWAS2
+    entrypoint:
+      - "nginx"
+      - "-g"
+      - "daemon off;"
+    depends_on:
+      - was1
+      - was2
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+
+  was1:
+    image: jeongwon201/cloud:springboot_v1
+    networks:
+      - standard_net
+    links:
+      - mariadb:dockerDB
+    environment:
+      - JAR_NAME=standard-1
+      - SOURCE_DIR=/app/spring-cloud/standard
+    entrypoint: java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod,db-maria-docker /app/spring-cloud/standard/target/standard-1.jar
+    depends_on:
+      - mariadb
+
+  was2:
+    image: jeongwon201/cloud:springboot_v1
+    networks:
+      - standard_net
+    links:
+      - mariadb:dockerDB
+    environment:
+      - JAR_NAME=standard-1
+      - SOURCE_DIR=/app/spring-cloud/standard
+    entrypoint: java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=prod,db-maria-docker /app/spring-cloud/standard/target/standard-1.jar
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb
+    networks:
+      - standard_net
+    environment:
+      - MYSQL_DATABASE=prod
+      - MYSQL_USER=user01
+      - MYSQL_PASSWORD=user01
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - /app/mariadb:/var/lib/mysql
+
+networks:
+  standard_net:
 ```
 <br />
 <br />
