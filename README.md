@@ -381,8 +381,12 @@ NatNetwork에 다음과 같이 포트 포워딩 조건을 추가합니다.
 ```
 http://localhost:107
 ```
+<br />
 
-
+웹 어플리케이션 CRUD 기능도 확인합니다.
+```
+http://localhost:107/dept
+```
 <br />
 <br />
 <br />
