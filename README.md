@@ -71,9 +71,6 @@ cd standard
 <br />
 
 
-편의를 위해 Bash Shell Script를 사용하여 작업 파일을 생성합니다.   
-<br />
-
 환경 변수 파일 ```00_SET_ENV``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
 ```
 #! /usr/bin/bash
@@ -130,3 +127,116 @@ export MYSQL_PASSWORD=user01
 export MYSQL_ROOT_PASSWORD=password
 export LOCAL_DB_DIR=/app/mariadb
 ```
+<br />
+<br />
+
+
+편의를 위해 Bash Shell Script를 사용하여 작업 파일을 생성합니다.   
+<br />
+
+### Java 11, Maven 빌드 도구 설치
+작업 파일 ```01_SET_BUILD.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+yum -y install yum
+
+yum -y install unzip
+
+yum -y install java-11-openjdk java-11-openjdk-devel
+
+yum -y install wget
+
+mkdir -p $MAVEN
+
+mkdir -p $APP_BASE
+
+wget --directory-prefix=$MAVEN https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip
+
+unzip -d $MAVEN $MAVEN/apache-maven-3.6.3-bin.zip
+```
+<br />
+
+권한 부여 후 파일을 실행합니다.
+```
+chmod +x 01_SET_BUILD.sh
+./01_SET_BUILD.sh
+```
+
+<br />
+<br />
+
+### GitHub에 업로드 된 웹 어플리케이션을 Jar 파일로 빌드 후 작업 폴더에 복사
+작업 파일 ```02_BUILD.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+export PATH=$MAVEN/apache-maven-3.6.3/bin:$PATH
+
+# 
+rm -rf $PROJECT_DIR
+
+git clone $SOURCE_URL $PROJECT_DIR
+
+mvn -DfinalName=$JAR_NAME install -f $APP_DIR
+
+cp $APP_DIR/target/$JAR_NAME.jar ./
+```
+<br />
+
+권한 부여 후 파일을 실행합니다.
+```
+chmod +x 02_BUILD.sh
+./02_BUILD.sh
+```
+<br />
+
+Java 11 버전 외 다른 버전을 삭제하지 않으면 오류가 발생합니다.   
+오류가 발생하면 앞서 수행했던 Java 11 외 모든 버전을 삭제하는 내용을 참고하세요.
+<br />
+<br />
+
+### 컨테이너 이미지를 위한 Dockerfile 생성
+Dockerfile ```Dockerfile``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+```
+FROM centos:7
+
+MAINTAINER jeongwon201@naver.com
+
+ENV TZ=Asia/Seoul
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+ENV LC_ALL=C.UTF-8
+
+RUN yum -y install java-11-openjdk java-11-openjdk-devel
+
+RUN mkdir -p /app/spring-cloud/standard/target/
+
+COPY ./standard-1.jar /app/spring-cloud/standard/target/
+
+EXPOSE 8000
+```
+<br />
+<br />
+
+### 컨테이너 이미지 생성
+작업 파일 ```03_MAKE_DOCKER_IMAGE.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력합니다.
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+docker build -t $IMAGE_NAME ./
+```
+<br />
+
+권한 부여 후 파일을 실행합니다.
+```
+chmod +x 03_MAKE_DOCKER_IMAGE.sh
+./03_MAKE_DOCKER_IMAGE.sh
+```
+<br />
+<br />
+
