@@ -341,7 +341,7 @@ networks:
 <br />
 <br />
 
-### Docker Compose로 컨테이너 실행
+### Docker Compose UP
 작업 파일 ```05_UP_DOCKER_COMPOSE.sh``` 을 vi 편집기로 생성 후 다음 내용을 입력 저장합니다.
 ```
 #! /usr/bin/bash
@@ -359,3 +359,65 @@ chmod +x 05_UP_DOCKER_COMPOSE.sh
 ```
 <br />
 <br />
+
+## 기타 Bash Shell Script
+위 스크립트 외 종료, 삭제, 리빌드, 이미지 삭제 등의 스크립트 파일에 대한 설명입니다.   
+<br />
+
+vi 편집기로 생성 후 권한을 빌드하여 실행하는 방법은 동일하므로, 파일 내용만을 설명합니다.
+<br />
+<br />
+
+```06_STOP_DOCKER_COMPOSE.sh```
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+docker compose -f docker-compose.yml stop
+```
+Docker Compose를 종료합니다.
+<br />
+<br />
+
+```07_DOWN_DOCKER_COMPOSE.sh```
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+docker compose -f docker-compose.yml down
+```
+Docker Compose를 종료하고 삭제합니다.
+<br />
+<br />
+
+```08_REBUILD_DOCKER_COMPOSE.sh```
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+./06_STOP_DOCKER_COMPOSE.sh
+./02_BUILD.sh
+./05_UP_DOCKER_COMPOSE.sh
+```
+웹 어플리케이션의 수정이 있을 경우 사용하는 스크립트입니다.   
+내용을 보면 Docker Compose를 종료하고 빌드를 수행하여 Docker Compose를 UP 하는 스크립트를 차례대로 수행합니다.
+<br />
+<br />
+
+```09_DOCKER_COMPOSE.sh```
+```
+#! /usr/bin/bash
+. ./00_SET_ENV
+
+./07_DOWN_DOCKER_COMPOSE.sh
+
+docker rmi $IMAGE_NAME
+```
+Docker Compose를 종료하고, 컨테이너 이미지를 삭제합니다.
+<br />
+<br />
+<br />
+<br />
+
+이중화 구성의 모든 과정은 유튜브 강의 영상을 참고하였습니다.
+https://www.youtube.com/playlist?list=PLogzC_RPf25E9qprqOIDTzwZ24PuEf-1v
