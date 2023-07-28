@@ -1,8 +1,14 @@
 # nginx-redundant | nginx 로드밸런싱으로 WAS 이중화
 
+<img align="right" src="https://github.com/jeongwon201/nginx-redundant/assets/81132541/7e26c842-b689-4e54-857d-767cdbcc0102" width="160px"/>
+<h3 align="left">nginx 서버 이중화 프로젝트입니다.</h3>
+
 nginx의 로드밸런싱 기능과 도커를 이용하여 하나의 웹 어플리케이션 서버를 이중화합니다.
 <br />
 <br />
+<br />
+
+## 프로젝트 구조
 
 업로드된 웹 어플리케이션은 간단한 CRUD 기능을 수행합니다.   
 - Build Tool: Maven
